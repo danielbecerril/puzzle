@@ -29,3 +29,9 @@
     grid-template-rows: 25% 25% 25% 25%;
 }
 
+#dialog {
+    position: absolute;
+    display: none;
+    background-color: yellow;
+
+}

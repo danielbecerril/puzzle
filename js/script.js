@@ -1,7 +1,10 @@
 //Obteniendo elementos de HTML.
 var cellContainer = document.getElementById("cell-container");
 var pieceContainer = document.getElementById("piece-container");
+var dialogElement = document.getElementById("dialog");
 var selectedPiece = null;
+
+document.onkeypress = keypress;
 
 createBoard();
 createPieces();
@@ -14,20 +17,23 @@ function createBoard() {
     width = width / 4;
     height = height / 4;
 
-    for(var i = 0;i < 16;i++) {
-        let cellElement = createCell(width, height);
-        addCell(cellElement);
+    for(var i = 0;i < 4;i++) {
+        for(var j = 0;j < 4;j++){
+            let cellElement = createCell(width, height, i+","+j);
+            addCell(cellElement);
+        }
+        
     }
 }
 
-function createCell(width, height) {
+function createCell(width, height, position) {
     cellElement = document.createElement("div");
     cellElement.style.width = width;
     cellElement.style.height = height;
     cellElement.style.border = "1px solid black";
     cellElement.style.backgroungColor = "yellow";
     cellElement.onclick = clickCell;
-
+    cellElement.dataset.position = position;
     return cellElement;
 }
 
@@ -42,9 +48,9 @@ function createPieces() {
     height /= 4;
     var pieces = generatePieceData();
 
-    for(let i = 0;i < 16; i++){
-            let pieceElement = createPiece(width, height, pieces[i]);  
-            addPiece(pieceElement);
+    for(var i = 0;i < 16; i++){
+            let pieceElement = createPiece(width, height, pieces[i]); 
+            addPiece(pieceElement); 
     }
 
 }
@@ -53,11 +59,11 @@ function generatePieceData() {
     //Generamos una lista de piezas con su path y posición.
     var pieces = [];
 
-    for (let i = 1; i <= 4; i++) {
-        for (let j = 1; j <= 4; j++) {
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
             let piece = {
-                image: "img/" + "arnold" + i + j + ".jpg",
-                position: [i]
+                image: "img/" + "arnold" + (i+1) + (j+1) + ".jpg",
+                position: i+","+j
             };
             pieces.push(piece);
         }
@@ -73,12 +79,13 @@ function createPiece(width, height, piece) {
     cellElement.style.width = width;
     cellElement.style.height = height;
 
-
+    cellElement.dataset.position = piece.position;
     //Configurando la pieza dentro del contenedor peizas
     pieceElement.width = width;
     pieceElement.height = height;
     pieceElement.style.border = "1px solid black";
     pieceElement.src = piece.image;
+    pieceElement.dataset.position = piece.position;
     pieceElement.onclick = clickPiece;
     //Mandar la pieza dentro de la celda
     cellElement.appendChild(pieceElement);
@@ -105,5 +112,55 @@ function clickCell(e) {
         cell.appendChild(selectedPiece);
     }else {
         console.log("Seleccione una pieza.");
+    }
+}
+
+function keypress(ke){
+    //console.log("Tecla presionada");
+    if(ke.keyCode == 101 || ke.keyCode == 69){
+        console.log("Tecla e presionada");
+        let result = evaluateBoard();
+        showDialog(result);
+    }
+}
+
+function showDialog(result){
+    var imgElement = dialogElement.children[0];
+    var textContent = dialogElement.children[1];    
+    if(result){
+        //ganaste
+        //imgElement.src = "img/arnold12.jpg";
+        textContent.innerText = "Ganaste";
+        console.log("Ganaste!");
+    }else{
+        //perdiste
+        //imgElement.scr = "img/arnold13.jpg"
+        textContent.innerText = "Perdiste";
+        console.log("Perdiste");
+    }
+    dialogElement.style.display = "block";
+}
+
+function evaluateBoard(){
+    var cells = cellContainer.children;
+    for(cell of cells){
+        let piece = cell.children[0];
+        if(piece.dataset.position != cell.dataset.position){
+            console.log("retornando falso");
+            return false;
+        }
+    }
+    console.log("Retornando false");
+    return true;
+}
+
+function returnPieces(){
+    let cells = cellContainer.children;
+    let cellPieces = pieceContainer.children;
+
+    for(cell of cells){
+        let position = cell.dataset.position;
+        let piece = cell.children[0];
+        cellPieces[position].appendChild(piece);
     }
 }
