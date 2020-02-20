@@ -8,6 +8,7 @@ document.onkeypress = keypress;
 
 createBoard();
 createPieces();
+
 //Creating cells
 function createBoard() {
     var width = cellContainer.offsetWidth;
@@ -122,6 +123,10 @@ function keypress(ke){
         let result = evaluateBoard();
         showDialog(result);
     }
+
+    if(ke.keyCode == 97){
+        returnPieces();
+    }
 }
 
 function showDialog(result){
@@ -157,10 +162,12 @@ function evaluateBoard(){
 function returnPieces(){
     let cells = cellContainer.children;
     let cellPieces = pieceContainer.children;
-
+    var i = 0;
+    //mis position esta en formato i,j así que se tiene que ller de esa manera para el appendChild
     for(cell of cells){
-        let position = cell.dataset.position;
+        //let position = cell.dataset.position;
         let piece = cell.children[0];
-        cellPieces[position].appendChild(piece);
+        cellPieces[i].appendChild(piece);
+        i++
     }
 }
