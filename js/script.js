@@ -65,12 +65,13 @@ function createPieces() {
 function generatePieceData() {
     //Generamos una lista de piezas con su path y posición.
     var pieces = [];
+    var indexShuffle = shuffle(4);
 
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
             let piece = {
-                image: "img/" + "arnold" + (i+1) + (j+1) + ".jpg",
-                position: i+","+j
+                image: "img/" + "arnold" + (indexShuffle[i]+1) + (indexShuffle[j]+1) + ".jpg",
+                position: indexShuffle[i]+","+indexShuffle[j]
             };
             pieces.push(piece);
         }
@@ -90,10 +91,12 @@ function createPiece(width, height, piece) {
     //Configurando la pieza dentro del contenedor peizas
     pieceElement.width = width;
     pieceElement.height = height;
+    cellElement.dataset.filled = "false";
 
     pieceElement.style.border = "1px solid black";
     pieceElement.src = piece.image;
     pieceElement.dataset.position = piece.position;
+    pieceElement.classList.add("piece-zoomin");
     
     //Seteando id de elemento
     pieceElement.id = "img" + piece.position;
@@ -102,6 +105,10 @@ function createPiece(width, height, piece) {
     //Seteando eventos
     pieceElement.onclick = clickPiece;
     pieceElement.ondragstart = dragPiece;
+    cellElement.ondragover = allowDrop;
+    //Para regresar las piezas
+    cellElement.ondrop = dropCell;
+
 
     //Mandar la pieza dentro de la celda
     cellElement.appendChild(pieceElement);
@@ -177,6 +184,7 @@ function evaluateBoard(){
 function returnPieces(){
     let cells = cellContainer.children;
     let cellPieces = pieceContainer.children;
+    var indexShuffle = shuffle(16);//Lista de números
     
     var i = 0;
     //mis position esta en formato i,j así que se tiene que ller de esa manera para el appendChild
@@ -185,8 +193,8 @@ function returnPieces(){
         let piece = cell.children[0];
         cellPieces[i].appendChild(piece);
         i++;
-        dialogElement.style.display = "none";
     }
+    dialogElement.style.display = "none";
 }
 
 function dragPiece(ev){
@@ -220,4 +228,18 @@ function dropCell(ev){
 
 function allowDrop(ev){
     ev.preventDefault();
+}
+
+function shuffle(max){
+    let listShuffle = [];
+    let i = 0;
+    temp = 0;
+    while(i<max){
+        temp = Math.round(Math.random() * (max-1));
+        if(listShuffle.indexOf(temp) == -1){
+            listShuffle.push(temp);
+            i++;
+        }
+    }
+    return listShuffle;
 }
