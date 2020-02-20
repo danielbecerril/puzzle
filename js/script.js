@@ -33,8 +33,14 @@ function createCell(width, height, position) {
     cellElement.style.height = height;
     cellElement.style.border = "1px solid black";
     cellElement.style.backgroungColor = "yellow";
-    cellElement.onclick = clickCell;
     cellElement.dataset.position = position;
+    cellElement.dataset.filled = "false";
+    
+    //Configurar eventos
+    cellElement.onclick = clickCell;
+    cellElement.ondrop = dropCell;
+    cellElement.ondragover = allowDrop;
+    
     return cellElement;
 }
 
@@ -84,10 +90,19 @@ function createPiece(width, height, piece) {
     //Configurando la pieza dentro del contenedor peizas
     pieceElement.width = width;
     pieceElement.height = height;
+
     pieceElement.style.border = "1px solid black";
     pieceElement.src = piece.image;
     pieceElement.dataset.position = piece.position;
+    
+    //Seteando id de elemento
+    pieceElement.id = "img" + piece.position;
+    //Activando draggable
+    pieceElement.draggable = true;
+    //Seteando eventos
     pieceElement.onclick = clickPiece;
+    pieceElement.ondragstart = dragPiece;
+
     //Mandar la pieza dentro de la celda
     cellElement.appendChild(pieceElement);
 
@@ -162,12 +177,47 @@ function evaluateBoard(){
 function returnPieces(){
     let cells = cellContainer.children;
     let cellPieces = pieceContainer.children;
+    
     var i = 0;
     //mis position esta en formato i,j así que se tiene que ller de esa manera para el appendChild
     for(cell of cells){
         //let position = cell.dataset.position;
         let piece = cell.children[0];
         cellPieces[i].appendChild(piece);
-        i++
+        i++;
+        dialogElement.style.display = "none";
     }
+}
+
+function dragPiece(ev){
+    console.log(ev);
+    let piece = ev.target;
+    ev.dataTransfer.setData("text",piece.id);
+    
+}
+
+function dropCell(ev){
+    console.log(ev);
+
+    //Recuperando el id de la pieza que viene en el evento drag
+    let dataId = ev.dataTransfer.getData("text");
+    //Recuperando el elemtno donde voy a soltar el otro elemento
+    let cell = ev.target;
+    //Recuperando la pieza a través de su id
+    let piece = document.getElementById(dataId);
+    //Agregamos el elemento
+    if (cell.dataset.filled=="false") {
+        console.log("Convirtiendo"+cell+" a true")
+        cell.appendChild(piece); 
+        cell.dataset.filled = "true";
+    }else if(cell.dataset.filled=="true"){
+        console.log("Convirtiendo"+cell+" a false")
+        cell.appendChild(piece);
+        cell.dataset.filled = "false";
+    }
+    
+}
+
+function allowDrop(ev){
+    ev.preventDefault();
 }
